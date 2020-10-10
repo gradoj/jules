@@ -1,5 +1,5 @@
 # jules
-Jules a helium network discord bot
+Jules is a helium network discord bot
 
 # install
 Create your own discord server where you have admin rights.
@@ -11,9 +11,13 @@ This bot is hosted. If you would like to create and host your own with this code
 # Commands
 
 $help
-  $api   {hotspot_name} witness
-  $hat   {hotspot_name} or para1 command as normal.eg $hat -x poc_summary -n yellow-rubber-ducky
-  $help  Shows this message
-  $kml   returns the latest kml file for google earth containing all hotspots
-  $polar {hotspot_name}
+$api    {hotspot_name} witness
+
+$hat    {hotspot_name} or para1 command as normal.eg $hat -x poc_summary -n yellow-rubber-ducky
+
+$help   Shows this message
+
+$kml    returns the latest kml file for google earth containing all hotspots
+
+$polar  {hotspot_name}
   
