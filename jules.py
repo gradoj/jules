@@ -12,7 +12,7 @@ import genkml
 #from dotenv import load_dotenv
 #load_dotenv()
 #DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
-DISCORD_TOKEN = 'put your bot token here'
+DISCORD_TOKEN = ''
 bot=commands.Bot(command_prefix='$')
 h=Hotspots.Hotspots()
 
@@ -38,14 +38,15 @@ async def api(ctx,hotspot,command):
              help="Calculated FSPL is divided by average RSSI and plotted on polar coordinate.",
              brief="{hotspot_name}")
 async def polar(ctx, hotspot):
-    #try:
-    addr=h.hspot_by_name[hotspot]['address']
-    cmd='python helium_analysis_tools\\analyze_hotspot.py -x poc_polar -n '+str(hotspot)
-    a=subprocess.Popen(cmd)
-    a.communicate()
-    await ctx.channel.send(file=discord.File(hotspot+'_map.html'))
-    #except Exception as e:
-    #    print(e)
+    try:
+        addr=h.hspot_by_name[hotspot]['address']
+        cmd=['python3','helium_analysis_tools/analyze_hotspot.py','-x','poc_polar','-n',str(hotspot)]
+        a=subprocess.Popen(cmd)
+        a.communicate()
+        for filename in os.listdir(hotspot):
+            await ctx.channel.send(file=discord.File(hotspot+'\\'+filename))
+    except Exception as e:
+        print(e)
 
 
 @bot.command(name='kml',
@@ -76,9 +77,26 @@ async def hat(ctx, *args):
         
         
         if len(args)==1:
-            cmd="python helium_analysis_tools\\analyze_hotspot.py -x poc_v10 -n " + args[0] #--address '+str(addr)
+            path='helium_analysis_tools/analyze_hotspot.py'
+
+
+            cmd=['python3',path,'-x','poc_summary','-n',args[0]] #--address '+str(addr)
             #try:
-            await ctx.channel.send('`'+cmd+'`')
+            str1=''
+            for a in cmd:
+                str1+=a+' '
+            await ctx.channel.send('`'+str1+'`')
+            a=subprocess.Popen(cmd,stdout=subprocess.PIPE)#,stderr=subprocess.STDOUT)
+            out=a.communicate()
+            await ctx.channel.send("`"+str(out[0], 'utf-8')+"`")
+
+            
+            cmd=['python3',path,'-x','poc_v10','-n',args[0]] #--address '+str(addr)
+            #try:
+            str1=''
+            for a in cmd:
+                str1+=a+' '
+            await ctx.channel.send('`'+str1+'`')
             a=subprocess.Popen(cmd,stdout=subprocess.PIPE)#,stderr=subprocess.STDOUT)
             out=a.communicate()
             await ctx.channel.send("`"+str(out[0], 'utf-8')+"`")
@@ -87,16 +105,22 @@ async def hat(ctx, *args):
             #await ctx.channel.send("That's not a hotspot. Use dashes like yellow-rubber-ducky")
             #    return
 
-            
-            cmd="python helium_analysis_tools\\analyze_hotspot.py -x poc_reliability -n " + args[0]#--address '+str(addr)
-            await ctx.channel.send('`'+cmd+'`')
+            cmd=['python3',path,'-x','poc_reliability','-n',args[0]]#--address '+str(addr)
+            str1=''
+            for a in cmd:  
+                str1 += a +' '
+            await ctx.channel.send('`'+str1+'`')
             a=subprocess.Popen(cmd,stdout=subprocess.PIPE)#,stderr=subprocess.STDOUT)
             out=a.communicate()
-            await ctx.channel.send("`"+str(out[0], 'utf-8')+"`")
+            for i in range(0,len(out[0]),1000):
+                await ctx.channel.send("`"+str(out[0][i:i+1000], 'utf-8')+"`")
 
         else:
-            cmd="python helium_analysis_tools\\analyze_hotspot.py " + response
-            await ctx.channel.send('`'+cmd+'`')
+            cmd=['python3', 'helium_analysis_tools/analyze_hotspot.py']+response.split()
+            str1=''
+            for a in cmd:
+                str1+=a+' '
+            await ctx.channel.send('`'+str1+'`')
             a=subprocess.Popen(cmd,stdout=subprocess.PIPE)#,stderr=subprocess.STDOUT)
             out=a.communicate()
 
@@ -107,7 +131,8 @@ async def hat(ctx, *args):
 @bot.event
 async def on_message(message):
     if message.content == "hello":
-        await message.channel.send("hello")
+        pass    
+    #await message.channel.send("hello")
 
     await bot.process_commands(message)
 
