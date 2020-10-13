@@ -29,7 +29,7 @@ def get_total(addr):
     #print(data)
 
 
-def genkml():
+def genkml(earnings=False):
     url = "https://api.helium.io/v1/hotspots"
     data=requests.get(url=url)
     data=data.json()
@@ -50,7 +50,10 @@ def genkml():
         #print(cursor)
 
 
-    fout=open("hotspots.csv","w+")
+    if earnings:
+        fout=open("hotspotsEarnings.csv","w+")
+    else:
+        fout=open("hotspots.csv","w+")
     fout.write('Name, Latitude, Longitude, Address, 24hrEarnings\n')
     count=0
     noloccount=0
@@ -59,9 +62,10 @@ def genkml():
             #print(hotspot['name'], hotspot['lat'], hotspot['lng'])
             #print(hotspot)
             addr=str(hotspot['address'])
-
-            total=str(0)#get_total(addr)
-            #get_total(addr)
+            if earnings:
+                total=get_total(addr)
+            else:
+                total=str(0)
             a=str(hotspot['name']) +','+ str(hotspot['lat']) +','+ str(hotspot['lng'])+','+ addr+','+total+'\n'
             fout.write(a)
             count=count+1

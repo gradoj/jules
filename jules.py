@@ -8,11 +8,12 @@ from discord.ext import commands
 from helium_analysis_tools.classes import Hotspots
 from helium_analysis_tools import utils
 import genkml
+import genEarnings
 
 #from dotenv import load_dotenv
 #load_dotenv()
 #DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
-DISCORD_TOKEN = ''
+DISCORD_TOKEN = 'NzY0MjIwMDExODUzMTE5NTg5.X4DFWQ.prHFicDQTlG_Xh0E--ix7p8Ah-8'
 bot=commands.Bot(command_prefix='$')
 h=Hotspots.Hotspots()
 
@@ -38,13 +39,14 @@ async def api(ctx,hotspot,command):
              help="Calculated FSPL is divided by average RSSI and plotted on polar coordinate.",
              brief="{hotspot_name}")
 async def polar(ctx, hotspot):
+    #try:
+        #addr=h.hspot_by_name[hotspot]['address']
     try:
-        addr=h.hspot_by_name[hotspot]['address']
         cmd=['python3','helium_analysis_tools/analyze_hotspot.py','-x','poc_polar','-n',str(hotspot)]
         a=subprocess.Popen(cmd)
         a.communicate()
         for filename in os.listdir(hotspot):
-            await ctx.channel.send(file=discord.File(hotspot+'\\'+filename))
+            await ctx.channel.send(file=discord.File(hotspot+'//'+filename))
     except Exception as e:
         print(e)
 
@@ -57,11 +59,29 @@ async def kml(ctx):
         if not os.path.exists('hotspots.kml'):
             genkml.genkml()
         file_time = os.path.getmtime('hotspots.kml') 
-        if (time.time() - file_time) / 3600 > 1:
+        if (time.time() - file_time) / 3600 > 6:
             await ctx.channel.send('Generating new file...')
             os.remove('hotspots.kml')
             genkml.genkml()
         await ctx.channel.send(file=discord.File('hotspots.kml'))
+    except Exception as e:
+        print(e)
+
+@bot.command(name='earn',
+             help="",
+             brief="returns an html file displaying hotspots x,y with bubble size of earnings for the last 24 hours")
+async def earn(ctx):
+    try:
+        if not os.path.exists('earnCircle.html'):
+            genEarnings.genEarnings()
+        file_time = os.path.getmtime('earnCircle.html') 
+        if (time.time() - file_time) / 3600 > 24:
+            await ctx.channel.send('Generating new file...')
+            os.remove('earnCircle.html')
+            os.remove('earnHeat.html')
+            genEarnings.genEarnings()
+        #await ctx.channel.send(file=discord.File('earnCircle.html'))
+        await ctx.channel.send(file=discord.File('earnHeat.html'))
     except Exception as e:
         print(e)
 
