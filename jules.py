@@ -13,7 +13,7 @@ import genEarnings
 #from dotenv import load_dotenv
 #load_dotenv()
 #DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
-DISCORD_TOKEN = 'NzY0MjIwMDExODUzMTE5NTg5.X4DFWQ.prHFicDQTlG_Xh0E--ix7p8Ah-8'
+DISCORD_TOKEN = ''
 bot=commands.Bot(command_prefix='$')
 h=Hotspots.Hotspots()
 
