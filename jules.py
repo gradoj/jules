@@ -37,12 +37,17 @@ async def api(ctx,hotspot,command):
 
 @bot.command(name='polar',
              help="Calculated FSPL is divided by average RSSI and plotted on polar coordinate.",
-             brief="{hotspot_name}")
-async def polar(ctx, hotspot):
+             brief="{hotspot_name} optional -g to include h3 grid")
+async def polar(ctx, hotspot, h3grid=None):
     #try:
         #addr=h.hspot_by_name[hotspot]['address']
     try:
-        cmd=['python3','helium_analysis_tools/analyze_hotspot.py','-x','poc_polar','-n',str(hotspot)]
+        if h3grid=='-g':
+            print('in-g')
+            cmd=['python3','helium_analysis_tools/analyze_hotspot.py','-x','poc_polar','-n',str(hotspot),'-g']    
+        else:
+            cmd=['python3','helium_analysis_tools/analyze_hotspot.py','-x','poc_polar','-n',str(hotspot)]
+        
         a=subprocess.Popen(cmd)
         a.communicate()
         for filename in os.listdir(hotspot):
@@ -73,14 +78,15 @@ async def kml(ctx):
 async def earn(ctx):
     try:
         if not os.path.exists('earnCircle.html'):
-            genEarnings.genEarnings()
+            pass
+            #genEarnings.genEarnings()
         file_time = os.path.getmtime('earnCircle.html') 
         if (time.time() - file_time) / 3600 > 24:
             await ctx.channel.send('Generating new file...')
-            os.remove('earnCircle.html')
-            os.remove('earnHeat.html')
-            genEarnings.genEarnings()
-        #await ctx.channel.send(file=discord.File('earnCircle.html'))
+            #os.remove('earnCircle.html')
+            #os.remove('earnHeat.html')
+            #genEarnings.genEarnings()
+        await ctx.channel.send(file=discord.File('earnCircle.html'))
         await ctx.channel.send(file=discord.File('earnHeat.html'))
     except Exception as e:
         print(e)
