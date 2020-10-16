@@ -37,21 +37,19 @@ async def api(ctx,hotspot,command):
 
 @bot.command(name='polar',
              help="Calculated FSPL is divided by average RSSI and plotted on polar coordinate.",
-             brief="{hotspot_name} optional -g to include h3 grid")
+             brief="{hotspot_name} eg. $polar yellow-rubber-ducky")
 async def polar(ctx, hotspot, h3grid=None):
     #try:
         #addr=h.hspot_by_name[hotspot]['address']
     try:
-        if h3grid=='-g':
-            print('in-g')
-            cmd=['python3','helium_analysis_tools/analyze_hotspot.py','-x','poc_polar','-n',str(hotspot),'-g']    
-        else:
-            cmd=['python3','helium_analysis_tools/analyze_hotspot.py','-x','poc_polar','-n',str(hotspot)]
+
+        cmd=['python3','helium_analysis_tools/analyze_hotspot.py','-x','poc_polar','-n',str(hotspot)]
         
         a=subprocess.Popen(cmd)
         a.communicate()
-        for filename in os.listdir(hotspot):
-            await ctx.channel.send(file=discord.File(hotspot+'//'+filename))
+        await ctx.channel.send(file=discord.File(hotspot+'//'+hotspot+'_map.html'))
+        #for filename in os.listdir(hotspot):
+        #    await ctx.channel.send(file=discord.File(hotspot+'//'+filename))
     except Exception as e:
         print(e)
 
